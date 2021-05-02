@@ -1,0 +1,7 @@
+/demo/*.mp3
+/demo/*.png
+/demo/bundle.*
+/dist/*.mp3
+/dist/*.png
+/dist/bundle.*
+/node_modules

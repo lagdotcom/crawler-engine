@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "module": "esnext",
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "noImplicitAny": true,
+    "sourceMap": true,
+    "outDir": "./dist",
+    "target": "esnext",
+    "lib": ["DOM", "ESNEXT"]
+  },
+  "include": ["src/**/*", "res"],
+  "exclude": ["node_modules"]
+}
