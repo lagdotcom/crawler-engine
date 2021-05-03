@@ -1,6 +1,5 @@
 import Cardinal from "./Cardinal";
-
-export type XY = [x: number, y: number];
+import XY from "./XY";
 
 export interface Surface {
   colour: number;

@@ -2,7 +2,6 @@ import {
   BoxGeometry,
   Mesh,
   MeshLambertMaterial,
-  Renderer,
   Scene,
   WebGLRenderer,
 } from "three";
@@ -11,13 +10,15 @@ import Cardinal from "./Cardinal";
 import Component from "./Component";
 import CrawlCamera from "./CrawlCamera";
 import EventHandler from "./EventHandler";
+import InputHandler from "./InputHandler";
 import World from "./World";
 import WorldDef from "./WorldDef";
 
 export default class Engine {
-  events: EventHandler;
   components: Component[];
-  renderer: Renderer;
+  events: EventHandler;
+  inputs: InputHandler;
+  renderer: WebGLRenderer;
   running: boolean;
   scene: Scene;
   time: number;
@@ -36,15 +37,15 @@ export default class Engine {
 
     this.scene = new Scene();
 
-    const renderer = new WebGLRenderer({ antialias: true });
-    renderer.setPixelRatio(window.devicePixelRatio);
-    renderer.setSize(innerWidth, innerHeight);
-    this.renderer = renderer;
+    this.renderer = new WebGLRenderer({ antialias: true });
+    this.renderer.setPixelRatio(window.devicePixelRatio);
+    this.renderer.setSize(innerWidth, innerHeight);
 
     this.view = new CrawlCamera({ ratio: innerWidth / innerHeight });
     this.components = [];
 
     this.events = new EventHandler();
+    this.inputs = new InputHandler();
     this.tick = this.tick.bind(this);
     this.time = 0;
   }
@@ -79,6 +80,7 @@ export default class Engine {
     this.running = true;
     this.view.attach(this);
     this.world.attach(this);
+    this.inputs.attach(this);
     this.components.forEach((m) => m.attach(this));
     requestAnimationFrame(this.tick);
   }
@@ -86,8 +88,9 @@ export default class Engine {
   stop(): void {
     this.running = false;
     this.components.forEach((m) => m.detach(this));
-    this.view.detach(this);
+    this.inputs.detach(this);
     this.world.detach(this);
+    this.view.detach(this);
   }
 
   use(def: WorldDef): void {
@@ -95,7 +98,7 @@ export default class Engine {
   }
 
   placeCamera(x: number, y: number, dir: Cardinal): void {
-    this.view.move(x, 0, y);
+    this.view.setPosition(x, 0, y);
     this.view.face(dir);
   }
 }

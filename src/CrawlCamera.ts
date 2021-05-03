@@ -1,8 +1,17 @@
 import { PerspectiveCamera, PointLight } from "three";
 
-import Cardinal, { dirToAngle, rotateCCW, rotateCW } from "./Cardinal";
+import Cardinal from "./Cardinal";
 import Component from "./Component";
 import Engine from "./Engine";
+import {
+  dirToAngle,
+  lerp,
+  lerpXY,
+  progress,
+  rotateCCW,
+  rotateCW,
+} from "./tools";
+import XY from "./XY";
 
 interface CrawlCameraSettings {
   facing?: Cardinal;
@@ -13,6 +22,8 @@ interface CrawlCameraSettings {
   bobSpeed?: number;
   bobAmount?: number;
   turnDuration?: number;
+  position?: XY;
+  moveDuration?: number;
 }
 
 const hpi = Math.PI / 2;
@@ -24,13 +35,25 @@ export default class CrawlCamera implements Component {
   engine: Engine;
   facing: Cardinal;
   light: PointLight;
+  position: XY;
   turnDuration: number;
+  moveDuration: number;
 
   turning: boolean;
-  turnUntil: number;
-  turnStep: number;
-  turnTo: Cardinal;
-  turnCheck: (angle: number) => boolean;
+  turnFrom: number;
+  turnTo: number;
+  turnStart: number;
+  turnEnd: number;
+  turnDir: Cardinal;
+
+  moving: boolean;
+  moveStart: number;
+  moveTo: XY;
+  moveEnd: number;
+
+  get busy(): boolean {
+    return this.turning || this.moving;
+  }
 
   constructor({
     facing = Cardinal.East,
@@ -41,6 +64,8 @@ export default class CrawlCamera implements Component {
     bobSpeed = 0.002,
     bobAmount = 0.01,
     turnDuration = 500,
+    moveDuration = 500,
+    position = [0, 0],
   }: CrawlCameraSettings) {
     this.camera = new PerspectiveCamera(fov, ratio);
     this.light = new PointLight(0xffffff, intensity, distance);
@@ -48,8 +73,11 @@ export default class CrawlCamera implements Component {
     this.bobSpeed = bobSpeed;
     this.bobAmount = bobAmount;
     this.turnDuration = turnDuration;
+    this.moveDuration = moveDuration;
+
     this.camera.add(this.light);
     this.tick = this.tick.bind(this);
+    this.setPosition(position[0], 0, position[1]);
   }
 
   attach(e: Engine): void {
@@ -63,20 +91,35 @@ export default class CrawlCamera implements Component {
     e.events.off("update", this.tick);
   }
 
-  tick({ ms }: { ms: number }): void {
-    this.camera.position.y =
-      Math.sin(this.engine.time * this.bobSpeed) * this.bobAmount;
+  tick(): void {
+    const t = this.engine.time;
+    const bob = Math.sin(t * this.bobSpeed) * this.bobAmount;
 
     if (this.turning) {
-      const angle = this.camera.rotation.y + this.turnStep * ms;
-      if (this.turnCheck(angle)) {
+      if (t >= this.turnEnd) {
         this.turning = false;
-        this.face(this.turnTo);
-      } else this.camera.rotation.y = angle;
+        this.face(this.turnDir);
+      } else {
+        const ratio = progress(this.turnStart, this.turnEnd, t);
+        const angle = lerp(this.turnFrom, this.turnTo, ratio);
+        this.camera.rotation.y = angle;
+      }
     }
+
+    if (this.moving) {
+      if (t >= this.moveEnd) {
+        this.moving = false;
+        this.setPosition(this.moveTo[0], bob, this.moveTo[1]);
+      } else {
+        const ratio = progress(this.moveStart, this.moveEnd, t);
+        const pos = lerpXY(this.position, this.moveTo, ratio);
+        this.camera.position.set(pos[0], bob, pos[1]);
+      }
+    } else this.camera.position.y = bob;
   }
 
-  move(x: number, y: number, z: number): void {
+  setPosition(x: number, y: number, z: number): void {
+    this.position = [x, z];
     this.camera.position.set(x, y, z);
   }
 
@@ -87,20 +130,27 @@ export default class CrawlCamera implements Component {
   }
 
   private turnBy(change: number) {
-    this.turnUntil = this.camera.rotation.y + change;
-    this.turnStep = change / this.turnDuration;
-    if (change > 0) this.turnCheck = (ang) => ang >= this.turnUntil;
-    else this.turnCheck = (ang) => ang <= this.turnUntil;
+    this.turnFrom = this.camera.rotation.y;
+    this.turnTo = this.turnFrom + change;
+    this.turnStart = this.engine.time;
+    this.turnEnd = this.turnStart + this.turnDuration;
     this.turning = true;
   }
 
   turnR(): void {
-    this.turnTo = rotateCW(this.facing);
+    this.turnDir = rotateCW(this.facing);
     return this.turnBy(-hpi);
   }
 
   turnL(): void {
-    this.turnTo = rotateCCW(this.facing);
+    this.turnDir = rotateCCW(this.facing);
     return this.turnBy(hpi);
+  }
+
+  move(x: number, y: number): void {
+    this.moveTo = [x, y];
+    this.moveStart = this.engine.time;
+    this.moveEnd = this.moveStart + this.moveDuration;
+    this.moving = true;
   }
 }

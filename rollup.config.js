@@ -30,6 +30,7 @@ if (process.env.ROLLUP_WATCH) {
     sourcemap: true,
     file: "demo/bundle.js",
     format: "iife",
+    exports: "named",
   });
   plugins.push(hmr({ public: "demo", baseUrl: "/" }));
   plugins.push(serve({ contentBase: "demo", open: true }));
@@ -37,6 +38,7 @@ if (process.env.ROLLUP_WATCH) {
   output.push({
     file: "dist/bundle.min.js",
     format: "iife",
+    exports: "named",
     plugins: [terser()],
   });
 }
