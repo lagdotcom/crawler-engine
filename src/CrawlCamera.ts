@@ -77,7 +77,7 @@ export default class CrawlCamera implements Component {
 
     this.camera.add(this.light);
     this.tick = this.tick.bind(this);
-    this.setPosition(position[0], 0, position[1]);
+    this.setPosition(position);
   }
 
   attach(e: Engine): void {
@@ -114,7 +114,7 @@ export default class CrawlCamera implements Component {
     if (this.moving) {
       if (t >= this.moveEnd) {
         this.moving = false;
-        this.setPosition(this.moveTo[0], bob, this.moveTo[1]);
+        this.setPosition(this.moveTo);
       } else {
         const ratio = progress(this.moveStart, this.moveEnd, t);
         const pos = lerpXY(this.position, this.moveTo, ratio);
@@ -123,9 +123,10 @@ export default class CrawlCamera implements Component {
     } else this.camera.position.y = bob;
   }
 
-  setPosition(x: number, y: number, z: number): void {
-    this.position = [x, z];
-    this.camera.position.set(x, y, z);
+  setPosition(pos: XY): void {
+    this.position = pos;
+    this.camera.position.x = pos[0];
+    this.camera.position.z = pos[0];
   }
 
   face(dir: Cardinal): void {

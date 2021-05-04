@@ -46,8 +46,7 @@ export default class World implements Component {
     e.scene.add(this.group);
     e.events.on("canMove", this.canMove);
 
-    const [x, y] = this.def.start;
-    e.placeCamera(x, y, this.def.face);
+    e.placeCamera(this.def.start, this.def.face);
   }
 
   detach(e: Engine): void {

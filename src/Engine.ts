@@ -15,6 +15,7 @@ import GeometryCache from "./GeometryCache";
 import InputHandler from "./InputHandler";
 import MaterialCache from "./MaterialCache";
 import World from "./World";
+import XY from "./XY";
 
 interface EngineOptions {
   width: number;
@@ -105,8 +106,8 @@ export default class Engine {
     this.components.forEach((m) => m.detach(this));
   }
 
-  placeCamera(x: number, y: number, dir: Cardinal): void {
-    this.view.setPosition(x, 0, y);
+  placeCamera(pos: XY, dir: Cardinal): void {
+    this.view.setPosition(pos);
     this.view.face(dir);
   }
 }
