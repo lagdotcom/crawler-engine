@@ -24,7 +24,7 @@ export default class InputHandler implements Component {
     this.keys.enabled = true;
   }
 
-  detach(e: Engine): void {
+  detach(): void {
     this.keys.enabled = false;
   }
 
@@ -68,6 +68,6 @@ export default class InputHandler implements Component {
     const result = this.engine.events.emit("canMove", { from, to, dir });
     if (result.stop) return;
 
-    this.engine.view.move(to);
+    this.engine.view.move(to, dir);
   }
 }

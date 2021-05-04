@@ -1,3 +1,4 @@
+import debug from "debug";
 import EventEmitter from "eventemitter3";
 
 import { EventMap, EventName } from "./Event";
@@ -24,10 +25,12 @@ export default class EventHandler implements Events {
   removeAllListeners: () => void;
 
   constructor() {
+    const log = debug("event");
     const emitter = new EventEmitter();
 
     this.emit = (name, data) => {
       emitter.emit(name, data);
+      if (name !== "update") log("%s %o", name, data);
       return data;
     };
     this.off = (name, listener) => emitter.off(name, listener);

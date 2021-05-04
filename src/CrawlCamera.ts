@@ -50,6 +50,7 @@ export default class CrawlCamera implements Component {
   moveStart!: number;
   moveTo!: XY;
   moveEnd!: number;
+  moveDir!: Cardinal;
 
   get busy(): boolean {
     return this.turning || this.moving;
@@ -103,6 +104,10 @@ export default class CrawlCamera implements Component {
     if (this.turning) {
       if (t >= this.turnEnd) {
         this.turning = false;
+        this.engine.events.emit("turned", {
+          from: this.facing,
+          to: this.turnDir,
+        });
         this.face(this.turnDir);
       } else {
         const ratio = progress(this.turnStart, this.turnEnd, t);
@@ -114,7 +119,14 @@ export default class CrawlCamera implements Component {
     if (this.moving) {
       if (t >= this.moveEnd) {
         this.moving = false;
+        this.engine.events.emit("moved", {
+          from: this.position,
+          to: this.moveTo,
+          dir: this.moveDir,
+        });
+
         this.setPosition(this.moveTo);
+        this.engine.events.emit("entered", { pos: this.position });
       } else {
         const ratio = progress(this.moveStart, this.moveEnd, t);
         const pos = lerpXY(this.position, this.moveTo, ratio);
@@ -126,7 +138,7 @@ export default class CrawlCamera implements Component {
   setPosition(pos: XY): void {
     this.position = pos;
     this.camera.position.x = pos[0];
-    this.camera.position.z = pos[0];
+    this.camera.position.z = pos[1];
   }
 
   face(dir: Cardinal): void {
@@ -136,6 +148,8 @@ export default class CrawlCamera implements Component {
   }
 
   private turnBy(change: number) {
+    this.engine.events.emit("turning", { from: this.facing, to: this.turnDir });
+
     this.turnFrom = this.camera.rotation.y;
     this.turnTo = this.turnFrom + change;
     this.turnStart = this.engine.time;
@@ -153,10 +167,13 @@ export default class CrawlCamera implements Component {
     return this.turnBy(hpi);
   }
 
-  move(pos: XY): void {
+  move(pos: XY, dir: Cardinal): void {
+    this.engine.events.emit("left", { pos: this.position });
+
     this.moveTo = pos;
     this.moveStart = this.engine.time;
     this.moveEnd = this.moveStart + this.moveDuration;
+    this.moveDir = dir;
     this.moving = true;
   }
 }

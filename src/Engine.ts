@@ -1,3 +1,4 @@
+import debug from "debug";
 import {
   BoxGeometry,
   Mesh,
@@ -28,6 +29,7 @@ export default class Engine {
   events: EventHandler;
   geo: GeometryCache;
   inputs: InputHandler;
+  log: debug.Debugger;
   mat: MaterialCache;
   renderer: WebGLRenderer;
   running: boolean;
@@ -40,6 +42,7 @@ export default class Engine {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (window as any).g = this;
 
+    this.log = debug("engine");
     this.scene = new Scene();
 
     this.renderer = new WebGLRenderer({ antialias: true });
@@ -57,6 +60,7 @@ export default class Engine {
     this.time = 0;
 
     this.components = [this.view, this.world, this.inputs];
+    this.log("ready");
   }
 
   get element(): HTMLCanvasElement {
@@ -66,6 +70,7 @@ export default class Engine {
   resize(width: number, height: number): void {
     this.renderer.setSize(width, height);
     this.view.resize(width, height);
+    this.log("resized: %dx%d", width, height);
   }
 
   testCube(): void {
@@ -99,11 +104,13 @@ export default class Engine {
     this.running = true;
     this.components.forEach((m) => m.attach(this));
     requestAnimationFrame(this.tick);
+    this.log("started");
   }
 
   stop(): void {
     this.running = false;
     this.components.forEach((m) => m.detach(this));
+    this.log("stopped");
   }
 
   placeCamera(pos: XY, dir: Cardinal): void {

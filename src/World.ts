@@ -1,8 +1,9 @@
+import debug from "debug";
 import { BackSide, FrontSide, Group, Mesh, Side } from "three";
 
 import Component from "./Component";
 import Engine from "./Engine";
-import { CanMoveData } from "./Event";
+import { MoveData } from "./Event";
 import GeometryCache from "./GeometryCache";
 import MaterialCache from "./MaterialCache";
 import { getWall } from "./tools";
@@ -13,22 +14,19 @@ export default class World implements Component {
   def!: WorldDef;
   engine!: Engine;
   group!: Group;
+  log: debug.Debugger;
   height!: number;
   width!: number;
 
   constructor(
     private geo: GeometryCache,
     private mat: MaterialCache,
-    def: WorldDef = {
-      start: [0, 0],
-      face: 0,
-      floor: 0,
-      ceiling: 1,
-      cells: [[]],
-    }
+    def?: WorldDef
   ) {
+    this.log = debug("world");
     this.canMove = this.canMove.bind(this);
-    this.use(def);
+
+    if (def) this.use(def);
   }
 
   use(def: WorldDef): void {
@@ -58,7 +56,7 @@ export default class World implements Component {
     return x >= 0 && x < this.width && y >= 0 && y < this.height;
   }
 
-  private canMove(e: CanMoveData) {
+  private canMove(e: MoveData) {
     if (!this.inBounds(e.to)) {
       e.stop = true;
       return;
@@ -71,12 +69,16 @@ export default class World implements Component {
   }
 
   private construct() {
+    this.log("creating geometry");
+
     for (let y = 0; y < this.height; y++) {
       for (let x = 0; x < this.width; x++) {
         const c = this.def.cells[y][x];
         this.makeCell(x, y, c);
       }
     }
+
+    this.log("done: %d cells", this.group.children.length);
   }
 
   private makeCell(x: number, y: number, c: Cell) {
