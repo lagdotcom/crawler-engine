@@ -59,8 +59,7 @@ export function progress(s: number, e: number, c: number): number {
   return 1 - (e - c) / (e - s);
 }
 
-export function lerp(s: number, e: number, ratio: number): number {
-  const r = Math.min(1, Math.max(0, ratio));
+export function lerp(s: number, e: number, r: number): number {
   return s * (1 - r) + e * r;
 }
 

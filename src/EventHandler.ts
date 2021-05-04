@@ -1,7 +1,7 @@
 import debug from "debug";
 import EventEmitter from "eventemitter3";
 
-import { EventMap, EventName } from "./Event";
+import { EventMap, EventName, EventNames } from "./Event";
 
 type ListenerFn = <T extends EventName>(
   name: T,
@@ -25,12 +25,13 @@ export default class EventHandler implements Events {
   removeAllListeners: () => void;
 
   constructor() {
-    const log = debug("event");
     const emitter = new EventEmitter();
+    const log = debug("event");
+    const logs = Object.fromEntries(EventNames.map((n) => [n, log.extend(n)]));
 
     this.emit = (name, data) => {
       emitter.emit(name, data);
-      if (name !== "update") log("%s %o", name, data);
+      logs[name]("%o", data);
       return data;
     };
     this.off = (name, listener) => emitter.off(name, listener);

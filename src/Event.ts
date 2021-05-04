@@ -1,3 +1,5 @@
+import { keys } from "ts-transformer-keys";
+
 import Cardinal from "./Cardinal";
 import XY from "./XY";
 
@@ -12,9 +14,10 @@ export interface EventMap {
   entered: PosData;
   left: PosData;
   moved: MoveData;
-  turning: TurnData;
   turned: TurnData;
+  turning: TurnData;
   update: UpdateData;
 }
 
 export type EventName = keyof EventMap;
+export const EventNames = keys<EventMap>();
