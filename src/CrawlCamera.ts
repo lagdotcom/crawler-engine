@@ -32,24 +32,24 @@ export default class CrawlCamera implements Component {
   bobSpeed: number;
   bobAmount: number;
   camera: PerspectiveCamera;
-  engine: Engine;
+  engine!: Engine;
   facing: Cardinal;
   light: PointLight;
-  position: XY;
+  position!: XY;
   turnDuration: number;
   moveDuration: number;
 
-  turning: boolean;
-  turnFrom: number;
-  turnTo: number;
-  turnStart: number;
-  turnEnd: number;
-  turnDir: Cardinal;
+  turning!: boolean;
+  turnFrom!: number;
+  turnTo!: number;
+  turnStart!: number;
+  turnEnd!: number;
+  turnDir!: Cardinal;
 
-  moving: boolean;
-  moveStart: number;
-  moveTo: XY;
-  moveEnd: number;
+  moving!: boolean;
+  moveStart!: number;
+  moveTo!: XY;
+  moveEnd!: number;
 
   get busy(): boolean {
     return this.turning || this.moving;
@@ -147,8 +147,8 @@ export default class CrawlCamera implements Component {
     return this.turnBy(hpi);
   }
 
-  move(x: number, y: number): void {
-    this.moveTo = [x, y];
+  move(pos: XY): void {
+    this.moveTo = pos;
     this.moveStart = this.engine.time;
     this.moveEnd = this.moveStart + this.moveDuration;
     this.moving = true;

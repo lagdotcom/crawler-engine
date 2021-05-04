@@ -23,7 +23,7 @@ export default class Engine {
   scene: Scene;
   time: number;
   view: CrawlCamera;
-  world: World;
+  world!: World;
 
   constructor({
     innerWidth,
@@ -47,6 +47,7 @@ export default class Engine {
     this.events = new EventHandler();
     this.inputs = new InputHandler();
     this.tick = this.tick.bind(this);
+    this.running = false;
     this.time = 0;
   }
 

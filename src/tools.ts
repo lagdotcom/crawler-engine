@@ -1,4 +1,5 @@
 import Cardinal from "./Cardinal";
+import { Cell, Surface } from "./WorldDef";
 import XY from "./XY";
 
 export function dirToOffset(d: Cardinal): XY {
@@ -65,4 +66,17 @@ export function lerp(s: number, e: number, ratio: number): number {
 
 export function lerpXY(s: XY, e: XY, ratio: number): XY {
   return [lerp(s[0], e[0], ratio), lerp(s[1], e[1], ratio)];
+}
+
+export function getWall(cell: Cell, dir: Cardinal): Surface | undefined {
+  switch (dir) {
+    case Cardinal.East:
+      return cell.east;
+    case Cardinal.North:
+      return cell.north;
+    case Cardinal.South:
+      return cell.south;
+    case Cardinal.West:
+      return cell.west;
+  }
 }

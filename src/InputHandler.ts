@@ -7,7 +7,7 @@ import Input from "./Input";
 import { addXYC, rotateCCW, rotateCW, turn180 } from "./tools";
 
 export default class InputHandler implements Component {
-  engine: Engine;
+  engine!: Engine;
   keys: KeyInputHandler<Input>;
 
   constructor() {
@@ -62,7 +62,12 @@ export default class InputHandler implements Component {
   }
 
   move(dir: Cardinal): void {
-    const [dx, dy] = addXYC(this.engine.view.position, dir);
-    this.engine.view.move(dx, dy);
+    const from = this.engine.view.position;
+    const to = addXYC(this.engine.view.position, dir);
+
+    const result = this.engine.events.emit("canMove", { from, to, dir });
+    if (result.stop) return;
+
+    this.engine.view.move(to);
   }
 }

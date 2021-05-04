@@ -3,6 +3,7 @@ import XY from "./XY";
 
 export interface Surface {
   colour: number;
+  solid?: boolean;
 }
 
 export interface Cell {
