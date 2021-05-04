@@ -9,6 +9,7 @@ import {
 import Cardinal from "./Cardinal";
 import Component from "./Component";
 import CrawlCamera from "./CrawlCamera";
+import { UpdateData } from "./Event";
 import EventHandler from "./EventHandler";
 import InputHandler from "./InputHandler";
 import World from "./World";
@@ -62,9 +63,14 @@ export default class Engine {
     cube.position.x += 3;
     cube.position.y += 0.1;
     this.scene.add(cube);
-    this.events.on("update", ({ ms }) => {
+
+    const cubeUpdate = ({ ms }: UpdateData) => {
       cube.rotation.x += ms * 0.001;
       cube.rotation.y += ms * 0.002;
+    };
+    this.components.push({
+      attach: (e) => e.events.on("update", cubeUpdate),
+      detach: (e) => e.events.off("update", cubeUpdate),
     });
   }
 

@@ -2,7 +2,6 @@ import commonjs from "@rollup/plugin-commonjs";
 import file from "rollup-plugin-import-file";
 import hmr from "rollup-plugin-hot";
 import json from "@rollup/plugin-json";
-import nodePolyfills from "rollup-plugin-node-polyfills";
 import pkg from "./package.json";
 import resolve from "@rollup/plugin-node-resolve";
 import serve from "rollup-plugin-serve";
@@ -16,14 +15,13 @@ const outputDir = production ? "dist" : "demo";
 
 const output = [];
 const plugins = [
-  nodePolyfills(),
   json({ preferConst: true }),
   file({ output: outputDir, extensions: /\.mp3/ }),
   url({ limit: 30 * 1024 }),
   sourcemaps(),
   resolve(),
-  commonjs(),
   typescript({ tsconfigDefaults: { sourceMap: true } }),
+  commonjs(),
 ];
 if (process.env.ROLLUP_WATCH) {
   output.push({

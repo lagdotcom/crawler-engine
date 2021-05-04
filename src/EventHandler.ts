@@ -1,4 +1,4 @@
-import EventEmitter from "events";
+import EventEmitter from "eventemitter3";
 
 import { EventMap, EventName } from "./Event";
 
@@ -12,6 +12,7 @@ interface Events {
   off: ListenerFn;
   on: ListenerFn;
   once: ListenerFn;
+  removeAllListeners(): void;
 }
 
 export default class EventHandler implements Events {
