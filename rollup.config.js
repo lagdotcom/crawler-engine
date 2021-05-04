@@ -34,4 +34,9 @@ if (!production) {
   });
 }
 
-export default { input: pkg.main, output, plugins };
+export default {
+  input: pkg.main,
+  output,
+  plugins,
+  watch: { clearScreen: false },
+};
