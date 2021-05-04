@@ -11,20 +11,23 @@ import Component from "./Component";
 import CrawlCamera from "./CrawlCamera";
 import { UpdateData } from "./Event";
 import EventHandler from "./EventHandler";
+import GeometryCache from "./GeometryCache";
 import InputHandler from "./InputHandler";
+import MaterialCache from "./MaterialCache";
 import World from "./World";
-import WorldDef from "./WorldDef";
 
 export default class Engine {
   components: Component[];
   events: EventHandler;
+  geo: GeometryCache;
   inputs: InputHandler;
+  mat: MaterialCache;
   renderer: WebGLRenderer;
   running: boolean;
   scene: Scene;
   time: number;
   view: CrawlCamera;
-  world!: World;
+  world: World;
 
   constructor({
     innerWidth,
@@ -42,7 +45,10 @@ export default class Engine {
     this.renderer.setPixelRatio(window.devicePixelRatio);
     this.renderer.setSize(innerWidth, innerHeight);
 
+    this.geo = new GeometryCache();
+    this.mat = new MaterialCache();
     this.view = new CrawlCamera({ ratio: innerWidth / innerHeight });
+    this.world = new World(this.geo, this.mat);
     this.components = [];
 
     this.events = new EventHandler();
@@ -98,10 +104,6 @@ export default class Engine {
     this.inputs.detach(this);
     this.world.detach(this);
     this.view.detach(this);
-  }
-
-  use(def: WorldDef): void {
-    this.world = new World(def);
   }
 
   placeCamera(x: number, y: number, dir: Cardinal): void {

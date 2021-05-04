@@ -1,35 +1,44 @@
-import {
-  BackSide,
-  BufferAttribute,
-  BufferGeometry,
-  FrontSide,
-  Group,
-  Mesh,
-  MeshBasicMaterial,
-  Side,
-} from "three";
+import { BackSide, FrontSide, Group, Mesh, Side } from "three";
 
 import Component from "./Component";
 import Engine from "./Engine";
 import { CanMoveData } from "./Event";
+import GeometryCache from "./GeometryCache";
+import MaterialCache from "./MaterialCache";
 import { getWall } from "./tools";
 import WorldDef, { Cell, Surface } from "./WorldDef";
 import XY from "./XY";
 
 export default class World implements Component {
+  def!: WorldDef;
   engine!: Engine;
-  group: Group;
-  width: number;
-  height: number;
+  group!: Group;
+  height!: number;
+  width!: number;
 
-  constructor(public def: WorldDef) {
+  constructor(
+    private geo: GeometryCache,
+    private mat: MaterialCache,
+    def: WorldDef = {
+      start: [0, 0],
+      face: 0,
+      floor: 0,
+      ceiling: 1,
+      cells: [[]],
+    }
+  ) {
+    this.canMove = this.canMove.bind(this);
+    this.use(def);
+  }
+
+  use(def: WorldDef): void {
+    this.def = def;
     this.group = new Group();
     this.group.name = "World";
 
     this.height = def.cells.length;
     this.width = def.cells[0].length;
     this.construct();
-    this.canMove = this.canMove.bind(this);
   }
 
   attach(e: Engine): void {
@@ -90,53 +99,20 @@ export default class World implements Component {
   }
 
   private makeFlat(f: Surface, h: number, side: Side) {
-    const s = 0.5;
-
-    const vertices = [-s, h, -s, s, h, -s, s, h, s, -s, h, s];
-    const faces = [0, 1, 3, 1, 2, 3];
-
-    return this.toFlat(faces, vertices, f.colour, side);
+    return new Mesh(this.geo.flat(h), this.mat.basic(f.colour, side));
   }
 
   private makeHWall(f: Surface, ym: number, side: Side) {
-    const s = 0.5;
-    const h = this.def.ceiling;
-    const l = this.def.floor;
-    const y = ym * 0.5;
-
-    const vertices = [-s, h, y, s, h, y, s, l, y, -s, l, y];
-    const faces = [0, 1, 3, 1, 2, 3];
-
-    return this.toFlat(faces, vertices, f.colour, side);
+    return new Mesh(
+      this.geo.horizontal(ym * 0.5, this.def.ceiling, this.def.floor),
+      this.mat.basic(f.colour, side)
+    );
   }
 
   private makeVWall(f: Surface, xm: number, side: Side) {
-    const s = 0.5;
-    const h = this.def.ceiling;
-    const l = this.def.floor;
-    const x = xm * 0.5;
-
-    const vertices = [x, h, s, x, h, -s, x, l, -s, x, l, s];
-    const faces = [0, 1, 3, 1, 2, 3];
-
-    return this.toFlat(faces, vertices, f.colour, side);
-  }
-
-  private toFlat(
-    faces: number[],
-    vertices: number[],
-    color: number,
-    side: Side
-  ) {
-    const geometry = new BufferGeometry();
-
-    geometry.setIndex(faces);
-    geometry.setAttribute(
-      "position",
-      new BufferAttribute(new Float32Array(vertices), 3)
+    return new Mesh(
+      this.geo.vertical(xm * 0.5, this.def.ceiling, this.def.floor),
+      this.mat.basic(f.colour, side)
     );
-    // const material = new MeshLambertMaterial({ color, side });
-    const material = new MeshBasicMaterial({ color, side });
-    return new Mesh(geometry, material);
   }
 }
