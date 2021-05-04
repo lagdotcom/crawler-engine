@@ -1,9 +1,15 @@
 import Cardinal from "./Cardinal";
 import Engine from "./Engine";
+import ResizeListener from "./ResizeListener";
 
 window.addEventListener("load", () => {
-  const engine = new Engine(window);
+  const engine = new Engine({
+    width: window.innerWidth,
+    height: window.innerHeight,
+    pixelRatio: window.devicePixelRatio,
+  });
   document.body.append(engine.element);
+  engine.components.push(new ResizeListener());
 
   const green = { colour: 0x00ff00, solid: true };
   const red = { colour: 0xff0000, solid: true };

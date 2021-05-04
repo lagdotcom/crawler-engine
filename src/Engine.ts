@@ -16,6 +16,12 @@ import InputHandler from "./InputHandler";
 import MaterialCache from "./MaterialCache";
 import World from "./World";
 
+interface EngineOptions {
+  width: number;
+  height: number;
+  pixelRatio?: number;
+}
+
 export default class Engine {
   components: Component[];
   events: EventHandler;
@@ -29,37 +35,36 @@ export default class Engine {
   view: CrawlCamera;
   world: World;
 
-  constructor({
-    innerWidth,
-    innerHeight,
-  }: {
-    innerWidth: number;
-    innerHeight: number;
-  }) {
+  constructor(o: EngineOptions) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (window as any).g = this;
 
     this.scene = new Scene();
 
     this.renderer = new WebGLRenderer({ antialias: true });
-    this.renderer.setPixelRatio(window.devicePixelRatio);
-    this.renderer.setSize(innerWidth, innerHeight);
+    if (o.pixelRatio) this.renderer.setPixelRatio(o.pixelRatio);
+    this.renderer.setSize(o.width, o.height);
 
     this.geo = new GeometryCache();
     this.mat = new MaterialCache();
-    this.view = new CrawlCamera({ ratio: innerWidth / innerHeight });
+    this.view = new CrawlCamera({ ratio: o.width / o.height });
     this.world = new World(this.geo, this.mat);
-    this.components = [];
-
     this.events = new EventHandler();
     this.inputs = new InputHandler();
     this.tick = this.tick.bind(this);
     this.running = false;
     this.time = 0;
+
+    this.components = [this.view, this.world, this.inputs];
   }
 
   get element(): HTMLCanvasElement {
     return this.renderer.domElement;
+  }
+
+  resize(width: number, height: number): void {
+    this.renderer.setSize(width, height);
+    this.view.resize(width, height);
   }
 
   testCube(): void {
@@ -91,9 +96,6 @@ export default class Engine {
 
   start(): void {
     this.running = true;
-    this.view.attach(this);
-    this.world.attach(this);
-    this.inputs.attach(this);
     this.components.forEach((m) => m.attach(this));
     requestAnimationFrame(this.tick);
   }
@@ -101,9 +103,6 @@ export default class Engine {
   stop(): void {
     this.running = false;
     this.components.forEach((m) => m.detach(this));
-    this.inputs.detach(this);
-    this.world.detach(this);
-    this.view.detach(this);
   }
 
   placeCamera(x: number, y: number, dir: Cardinal): void {

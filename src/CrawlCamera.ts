@@ -91,6 +91,11 @@ export default class CrawlCamera implements Component {
     e.events.off("update", this.tick);
   }
 
+  resize(width: number, height: number): void {
+    this.camera.aspect = width / height;
+    this.camera.updateProjectionMatrix();
+  }
+
   tick(): void {
     const t = this.engine.time;
     const bob = Math.sin(t * this.bobSpeed) * this.bobAmount;
