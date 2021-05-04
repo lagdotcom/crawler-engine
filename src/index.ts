@@ -15,6 +15,7 @@ window.addEventListener("load", () => {
   const red = { colour: 0xff0000, solid: true };
   const blue = { colour: 0x0000ff, solid: true };
   const magenta = { colour: 0xff00ff, solid: true };
+  const fake = { colour: 0, opacity: 0.9 };
 
   engine.world.use({
     start: [0, 0],
@@ -29,7 +30,7 @@ window.addEventListener("load", () => {
         { floor: magenta, ceiling: magenta },
       ],
       [
-        { floor: magenta, ceiling: magenta },
+        { floor: magenta, ceiling: magenta, north: fake },
         { floor: red, ceiling: red },
         { floor: green, ceiling: green },
         { floor: blue, ceiling: blue },

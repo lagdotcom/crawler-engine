@@ -99,20 +99,23 @@ export default class World implements Component {
   }
 
   private makeFlat(f: Surface, h: number, side: Side) {
-    return new Mesh(this.geo.flat(h), this.mat.basic(f.colour, side));
+    return new Mesh(
+      this.geo.flat(h),
+      this.mat.basic(f.colour, side, f.opacity)
+    );
   }
 
   private makeHWall(f: Surface, ym: number, side: Side) {
     return new Mesh(
       this.geo.horizontal(ym * 0.5, this.def.ceiling, this.def.floor),
-      this.mat.basic(f.colour, side)
+      this.mat.basic(f.colour, side, f.opacity)
     );
   }
 
   private makeVWall(f: Surface, xm: number, side: Side) {
     return new Mesh(
       this.geo.vertical(xm * 0.5, this.def.ceiling, this.def.floor),
-      this.mat.basic(f.colour, side)
+      this.mat.basic(f.colour, side, f.opacity)
     );
   }
 }
