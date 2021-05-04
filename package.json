@@ -1,5 +1,5 @@
 {
-  "name": "crawler-webgl-test",
+  "name": "crawler-engine",
   "version": "1.0.0",
   "description": "Testing a dungeon crawler engine in WebGL.",
   "main": "src/index.ts",
