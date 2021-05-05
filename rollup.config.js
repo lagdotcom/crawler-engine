@@ -8,9 +8,12 @@ import { terser } from "rollup-plugin-terser";
 import typescript from "rollup-plugin-typescript2";
 import keysTransformer from "ts-transformer-keys/transformer";
 
+// eslint-disable-next-line no-undef
 const production = !process.env.ROLLUP_WATCH;
 
+/** @type {import('rollup').OutputOptions[]} */
 const output = [];
+/** @type {import('rollup').Plugin[]} */
 const plugins = [
   sourcemaps(),
   resolve({ browser: true }),
@@ -43,9 +46,11 @@ if (!production) {
   });
 }
 
-export default {
+/** @type {import('rollup').RollupOptions} */
+const options = {
   input: pkg.main,
   output,
   plugins,
   watch: { clearScreen: false },
 };
+export default options;
