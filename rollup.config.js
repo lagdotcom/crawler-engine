@@ -35,7 +35,7 @@ if (!production) {
     format: "iife",
     exports: "named",
   });
-  plugins.push(hmr({ public: "demo", baseUrl: "/" }));
+  plugins.push(hmr({ public: "demo" }));
   plugins.push(serve({ contentBase: "demo", open: true }));
 } else {
   output.push({
