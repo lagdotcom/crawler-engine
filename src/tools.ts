@@ -79,3 +79,20 @@ export function getWall(cell: Cell, dir: Cardinal): Surface | undefined {
       return cell.west;
   }
 }
+
+export function makeGrid<T>(
+  width: number,
+  height: number,
+  fn: (x: number, y: number) => T
+): T[][] {
+  const rows: T[][] = [];
+
+  for (let y = 0; y < height; y++) {
+    const row: T[] = [];
+    for (let x = 0; x < width; x++) row.push(fn(x, y));
+
+    rows.push(row);
+  }
+
+  return rows;
+}

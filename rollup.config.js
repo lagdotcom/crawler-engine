@@ -1,5 +1,6 @@
 import commonjs from "@rollup/plugin-commonjs";
 import hmr from "rollup-plugin-hot";
+import json from "@rollup/plugin-json";
 import pkg from "./package.json";
 import resolve from "@rollup/plugin-node-resolve";
 import serve from "rollup-plugin-serve";
@@ -17,6 +18,7 @@ const output = [];
 const plugins = [
   sourcemaps(),
   resolve({ browser: true }),
+  json(),
   typescript({
     tsconfigDefaults: { sourceMap: true },
     transformers: [
