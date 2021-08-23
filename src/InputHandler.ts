@@ -9,26 +9,35 @@ import { addXYC, rotateCCW, rotateCW, turn180 } from "./tools";
 export default class InputHandler implements Component {
   engine!: Engine;
   keys: KeyInputHandler<Input>;
+  waiting?: Input;
 
   constructor() {
     this.translator = this.translator.bind(this);
     this.listener = this.listener.bind(this);
+    this.update = this.update.bind(this);
     this.keys = new KeyInputHandler(this.translator, this.listener, {
       enabled: true,
-      events: ["keydown"],
+      events: ["keydown", "keyup"],
     });
   }
 
   attach(e: Engine): void {
     this.engine = e;
     this.keys.enabled = true;
+    e.events.on("update", this.update);
   }
 
   detach(): void {
     this.keys.enabled = false;
+    this.engine.events.off("update", this.update);
   }
 
   translator(e: KeyboardEvent): Input | undefined {
+    if (e.type === "keyup") {
+      this.waiting = undefined;
+      return;
+    }
+
     switch (e.key) {
       case "ArrowUp":
         return { type: "advance" };
@@ -44,7 +53,10 @@ export default class InputHandler implements Component {
   }
 
   listener(e: Input): void {
-    if (this.engine.view.busy) return;
+    if (this.engine.view.busy) {
+      this.waiting = e;
+      return;
+    }
 
     const dir = this.engine.view.facing;
     switch (e.type) {
@@ -69,5 +81,12 @@ export default class InputHandler implements Component {
     if (result.stop) return;
 
     this.engine.view.move(to, dir);
+  }
+
+  update() {
+    if (this.waiting && !this.engine.view.busy) {
+      this.listener(this.waiting);
+      this.waiting = undefined;
+    }
   }
 }
