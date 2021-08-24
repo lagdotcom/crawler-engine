@@ -60,8 +60,8 @@ export default class CrawlCamera implements Component {
     facing = Cardinal.East,
     fov = 70,
     ratio,
-    intensity = 5,
-    distance = 10,
+    intensity = 0.4,
+    distance = 4,
     bobSpeed = 0.002,
     bobAmount = 0.01,
     turnDuration = 500,
@@ -144,7 +144,6 @@ export default class CrawlCamera implements Component {
   face(dir: Cardinal): void {
     this.facing = dir;
     this.camera.rotation.y = dirToAngle(dir);
-    // this.light.rotation.copy(this.camera.rotation);
   }
 
   private turnBy(change: number) {

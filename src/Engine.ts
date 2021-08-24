@@ -1,6 +1,8 @@
 import debug from "debug";
 import {
+  AmbientLight,
   BoxGeometry,
+  DirectionalLight,
   Mesh,
   MeshLambertMaterial,
   Scene,
@@ -25,6 +27,7 @@ interface EngineOptions {
 }
 
 export default class Engine {
+  ambience: AmbientLight;
   components: Component[];
   events: EventHandler;
   geo: GeometryCache;
@@ -34,6 +37,7 @@ export default class Engine {
   renderer: WebGLRenderer;
   running: boolean;
   scene: Scene;
+  sun: DirectionalLight;
   time: number;
   view: CrawlCamera;
   world: World;
@@ -58,6 +62,15 @@ export default class Engine {
     this.tick = this.tick.bind(this);
     this.running = false;
     this.time = 0;
+
+    this.ambience = new AmbientLight(0xffffff, 0.1);
+    this.scene.add(this.ambience);
+
+    const sun = new DirectionalLight(0xffffff, 0.1);
+    sun.position.set(0, 40, 0);
+    sun.target.position.set(0, 0, 0);
+    this.sun = sun;
+    this.scene.add(sun, sun.target);
 
     this.components = [this.view, this.world, this.inputs];
     this.log("ready");
