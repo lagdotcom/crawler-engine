@@ -41,10 +41,11 @@ if (!production) {
   plugins.push(serve({ contentBase: "demo", open: true }));
 } else {
   output.push({
-    file: "dist/bundle.min.js",
+    file: "docs/bundle.min.js",
     format: "iife",
     exports: "named",
-    plugins: [terser()],
+    // TODO: broken?
+    // plugins: [terser()],
   });
 }
 
