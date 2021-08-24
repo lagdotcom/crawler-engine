@@ -32,8 +32,8 @@ export default function loadGridCartographerJSON(
   let start = undefined;
 
   const cnv = (wx: number, wy: number) => {
-    const x = wx + ox;
-    const iy = wy + oy;
+    const x = wx;
+    const iy = wy - oy;
     const y = h - iy - 1;
 
     return [x, y];
@@ -48,9 +48,6 @@ export default function loadGridCartographerJSON(
 
   const pal = (i: number) => parseInt(palette[i].rgb.substr(1), 16);
 
-  const dark = 0x101010;
-  const norm = 0x202020;
-
   f.tiles.rows?.forEach((r) => {
     let x = r.start;
     r.tdata.forEach((t) => {
@@ -58,12 +55,10 @@ export default function loadGridCartographerJSON(
 
       const mt = at(x, r.y);
       if (t.t && mt)
-        mt.floor = t.d
-          ? { colour: dark, opacity: 1, solid: true }
-          : { colour: norm, opacity: 1, solid: true };
+        mt.floor = { colour: pal(t.tc || 0), opacity: 1, solid: true };
 
       if (t.b) {
-        const ut = at(x, r.y);
+        const ut = mt;
         const bt = at(x, r.y - 1);
         const colour = pal(t.bc || 0);
 
@@ -117,7 +112,7 @@ export default function loadGridCartographerJSON(
       }
 
       if (t.r) {
-        const lt = at(x, r.y);
+        const lt = mt;
         const rt = at(x + 1, r.y);
         const colour = pal(t.rc || 0);
 

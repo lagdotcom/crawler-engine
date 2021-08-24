@@ -62,10 +62,14 @@ export default class World implements Component {
       return;
     }
 
-    const [x, y] = e.from;
-    const cell = this.def.cells[y][x];
-    const wall = getWall(cell, e.dir);
+    const [sx, sy] = e.from;
+    const src = this.def.cells[sy][sx];
+    const wall = getWall(src, e.dir);
     if (wall?.solid) e.stop = true;
+
+    const [dx, dy] = e.to;
+    const dst = this.def.cells[dy][dx];
+    if (!dst.floor?.solid) e.stop = true;
   }
 
   private construct() {

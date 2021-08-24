@@ -1,4 +1,4 @@
-import mapJson from "../res/wiz_lols_trials.json";
+import mapJson from "../res/backstabbers.json";
 import Cardinal from "./Cardinal";
 import Engine from "./Engine";
 import loadGridCartographerJSON from "./GridCartographer";
