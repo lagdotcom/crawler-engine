@@ -1,12 +1,12 @@
 import debug from "debug";
-import { BackSide, FrontSide, Group, Mesh, Side } from "three";
+import { BackSide as BS, FrontSide as FS, Group, Mesh, Side } from "three";
 
 import Component from "./Component";
 import Engine from "./Engine";
 import { MoveData } from "./Event";
 import GeometryCache from "./GeometryCache";
 import MaterialCache from "./MaterialCache";
-import { getWall } from "./tools";
+import { getWall, gridAt } from "./tools";
 import WorldDef, { Cell, Surface } from "./WorldDef";
 import XY from "./XY";
 
@@ -56,6 +56,13 @@ export default class World implements Component {
     return x >= 0 && x < this.width && y >= 0 && y < this.height;
   }
 
+  cell(xy: XY): Cell | undefined {
+    if (this.inBounds(xy)) {
+      const [x, y] = xy;
+      return this.def.cells[y][x];
+    }
+  }
+
   private canMove(e: MoveData) {
     if (!this.inBounds(e.to)) {
       e.stop = true;
@@ -78,26 +85,73 @@ export default class World implements Component {
     for (let y = 0; y < this.height; y++) {
       for (let x = 0; x < this.width; x++) {
         const c = this.def.cells[y][x];
-        this.makeCell(x, y, c);
+        const north = gridAt(this.def.cells, x, y - 1);
+        const east = gridAt(this.def.cells, x + 1, y);
+        const south = gridAt(this.def.cells, x, y + 1);
+        const west = gridAt(this.def.cells, x - 1, y);
+
+        this.makeCell(x, y, c, north, east, south, west);
       }
     }
 
     this.log("done: %d cells", this.group.children.length);
   }
 
-  private makeCell(x: number, y: number, c: Cell) {
+  private makeCell(
+    x: number,
+    y: number,
+    c: Cell,
+    nc?: Cell,
+    ec?: Cell,
+    sc?: Cell,
+    wc?: Cell
+  ) {
     const cell = new Group();
+    const e = c.elevation;
+    const fl = this.def.floor;
+    const ce = this.def.ceiling;
 
-    if (c.floor) cell.add(this.makeFlat(c.floor, this.def.floor, BackSide));
-    if (c.ceiling)
-      cell.add(this.makeFlat(c.ceiling, this.def.ceiling, FrontSide));
-    if (c.north) cell.add(this.makeHWall(c.north, -1, BackSide));
-    if (c.south) cell.add(this.makeHWall(c.south, 1, FrontSide));
-    if (c.west) cell.add(this.makeVWall(c.west, -1, BackSide));
-    if (c.east) cell.add(this.makeVWall(c.east, 1, FrontSide));
+    if (c.floor) cell.add(this.makeFlat(c.floor, this.def.floor, BS));
+    if (c.ceiling) cell.add(this.makeFlat(c.ceiling, this.def.ceiling, FS));
+    if (c.north) cell.add(this.makeHWall(c.north, -1, BS));
+    if (c.south) cell.add(this.makeHWall(c.south, 1, FS));
+    if (c.west) cell.add(this.makeVWall(c.west, -1, BS));
+    if (c.east) cell.add(this.makeVWall(c.east, 1, FS));
+
+    // TODO: colour??
+    const fills = { colour: 0xffffff };
+
+    // TODO: slopes instead of steps???
+    if (nc && nc.elevation > e) {
+      cell.add(this.makeHWall(fills, -1, BS, nc.elevation - e + fl, fl));
+
+      if (c.ceiling)
+        cell.add(this.makeHWall(fills, -1, FS, nc.elevation - e + ce, ce));
+    }
+
+    if (sc && sc.elevation > e) {
+      cell.add(this.makeHWall(fills, 1, FS, sc.elevation - e + fl, fl));
+
+      if (c.ceiling)
+        cell.add(this.makeHWall(fills, 1, BS, sc.elevation - e + ce, ce));
+    }
+
+    if (wc && wc.elevation > e) {
+      cell.add(this.makeVWall(fills, -1, BS, wc.elevation - e + fl, fl));
+
+      if (c.ceiling)
+        cell.add(this.makeVWall(fills, -1, FS, wc.elevation - e + ce, ce));
+    }
+
+    if (ec && ec.elevation > e) {
+      cell.add(this.makeVWall(fills, 1, FS, ec.elevation - e + fl, fl));
+
+      if (c.ceiling)
+        cell.add(this.makeVWall(fills, 1, BS, ec.elevation - e + ce, ce));
+    }
 
     if (cell.children.length) {
-      cell.position.set(x, 0, y);
+      cell.position.set(x, e, y);
       cell.name = `${x},${y}`;
       this.group.add(cell);
     }
@@ -110,16 +164,28 @@ export default class World implements Component {
     );
   }
 
-  private makeHWall(f: Surface, ym: number, side: Side) {
+  private makeHWall(
+    f: Surface,
+    ym: number,
+    side: Side,
+    ce = this.def.ceiling,
+    fl = this.def.floor
+  ) {
     return new Mesh(
-      this.geo.horizontal(ym * 0.5, this.def.ceiling, this.def.floor),
+      this.geo.horizontal(ym * 0.5, ce, fl),
       this.mat.basic(f.colour, side, f.opacity)
     );
   }
 
-  private makeVWall(f: Surface, xm: number, side: Side) {
+  private makeVWall(
+    f: Surface,
+    xm: number,
+    side: Side,
+    ce = this.def.ceiling,
+    fl = this.def.floor
+  ) {
     return new Mesh(
-      this.geo.vertical(xm * 0.5, this.def.ceiling, this.def.floor),
+      this.geo.vertical(xm * 0.5, ce, fl),
       this.mat.basic(f.colour, side, f.opacity)
     );
   }

@@ -177,5 +177,5 @@ export interface Tile {
   snip?: "tl" | "br";
 
   /** Elevation of this tile, an integer value from 1 to 255. Tiles with an elevation of 0 will not have this attribute. */
-  el?: number;
+  el?: string;
 }

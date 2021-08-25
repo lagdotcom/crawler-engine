@@ -14,6 +14,7 @@ export interface Cell {
   east?: Surface;
   south?: Surface;
   west?: Surface;
+  elevation: number;
 }
 
 export default interface WorldDef {

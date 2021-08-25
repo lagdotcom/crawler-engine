@@ -23,12 +23,11 @@ export default function loadGridCartographerJSON(
   const f = r.floors.find((f) => f.index === floor);
   if (!f) throw new Error(`Unknown region/floor: ${region}/${floor}`);
 
-  const ox = f.tiles.bounds.x0;
   const oy = f.tiles.bounds.y0;
   const w = f.tiles.bounds.width;
   const h = f.tiles.bounds.height;
 
-  const cells = makeGrid<Cell>(w, h, () => ({}));
+  const cells = makeGrid<Cell>(w, h, () => ({ elevation: 0 }));
   let start = undefined;
 
   const cnv = (wx: number, wy: number) => {
@@ -54,8 +53,15 @@ export default function loadGridCartographerJSON(
       if (t.m === Marker.Exit) start = cnv(x, r.y);
 
       const mt = at(x, r.y);
-      if (t.t && mt)
-        mt.floor = { colour: pal(t.tc || 0), opacity: 1, solid: true };
+      if (mt) {
+        if (t.t) mt.floor = { colour: pal(t.tc || 0), opacity: 1, solid: true };
+
+        // TODO: ceiling colour?
+        if (t.c) mt.ceiling = { colour: pal(0), opacity: 1, solid: true };
+
+        // TODO: configurable step amounts?
+        if (t.el) mt.elevation = parseInt(t.el, 10) / 10;
+      }
 
       if (t.b) {
         const ut = mt;
