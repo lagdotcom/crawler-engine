@@ -96,3 +96,10 @@ export function makeGrid<T>(
 
   return rows;
 }
+
+export function gridAt<T>(grid: T[][], x: number, y: number): T | undefined {
+  const row = grid[y];
+  if (!row) return undefined;
+
+  return row[x];
+}

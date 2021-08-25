@@ -64,8 +64,8 @@ export default class CrawlCamera implements Component {
     distance = 4,
     bobSpeed = 0.002,
     bobAmount = 0.01,
-    turnDuration = 500,
-    moveDuration = 500,
+    turnDuration = 400,
+    moveDuration = 400,
     position = [0, 0],
   }: CrawlCameraSettings) {
     this.camera = new PerspectiveCamera(fov, ratio);
@@ -100,6 +100,7 @@ export default class CrawlCamera implements Component {
   tick(): void {
     const t = this.engine.time;
     const bob = Math.sin(t * this.bobSpeed) * this.bobAmount;
+    const cell = this.engine.world.cell(this.position);
 
     if (this.turning) {
       if (t >= this.turnEnd) {
@@ -117,6 +118,8 @@ export default class CrawlCamera implements Component {
     }
 
     if (this.moving) {
+      const cell2 = this.engine.world.cell(this.moveTo);
+
       if (t >= this.moveEnd) {
         this.moving = false;
         this.engine.events.emit("moved", {
@@ -125,19 +128,21 @@ export default class CrawlCamera implements Component {
           dir: this.moveDir,
         });
 
-        this.setPosition(this.moveTo);
+        this.setPosition(this.moveTo, (cell2?.elevation || 0) + bob);
         this.engine.events.emit("entered", { pos: this.position });
       } else {
         const ratio = progress(this.moveStart, this.moveEnd, t);
         const pos = lerpXY(this.position, this.moveTo, ratio);
-        this.camera.position.set(pos[0], bob, pos[1]);
+        const y = lerp(cell?.elevation || 0, cell2?.elevation || 0, ratio);
+        this.camera.position.set(pos[0], y + bob, pos[1]);
       }
-    } else this.camera.position.y = bob;
+    } else this.camera.position.y = (cell?.elevation || 0) + bob;
   }
 
-  setPosition(pos: XY): void {
+  setPosition(pos: XY, y = 0): void {
     this.position = pos;
     this.camera.position.x = pos[0];
+    this.camera.position.y = y;
     this.camera.position.z = pos[1];
   }
 

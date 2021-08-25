@@ -15,7 +15,7 @@ window.addEventListener("load", () => {
   engine.components.push(new ResizeListener());
 
   const { cells, start } = loadGridCartographerJSON(mapJson as GCMap, 0, -1);
-  console.log({ cells, start });
+  // console.log({ cells, start });
 
   engine.world.use({
     start: start || [0, 0],
