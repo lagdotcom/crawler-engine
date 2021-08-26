@@ -41,6 +41,6 @@
     "@lagdotcom/simple-inputs": "git+https://github.com/lagdotcom/simple-inputs.git",
     "debug": "^4.3.2",
     "eventemitter3": "^4.0.7",
-    "three": "^0.131.3"
+    "three": "^0.132.0"
   }
 }
