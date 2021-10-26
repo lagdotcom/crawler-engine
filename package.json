@@ -20,7 +20,7 @@
     "@types/debug": "^4.1.7",
     "@types/moo": "^0.5.5",
     "@types/nearley": "^2.11.2",
-    "@types/node": "^16.7.0",
+    "@types/node": "^16.11.6",
     "@types/three": "^0.132.0",
     "@typescript-eslint/eslint-plugin": "^4.29.2",
     "@typescript-eslint/parser": "^4.29.3",
