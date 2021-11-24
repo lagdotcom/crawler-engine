@@ -14,14 +14,14 @@
   "author": "Lag.Com <lagdotcom@gmail.com>",
   "license": "ISC",
   "devDependencies": {
-    "@rollup/plugin-commonjs": "^20.0.0",
+    "@rollup/plugin-commonjs": "^21.0.1",
     "@rollup/plugin-json": "^4.1.0",
     "@rollup/plugin-node-resolve": "^13.0.4",
     "@types/debug": "^4.1.7",
     "@types/moo": "^0.5.5",
     "@types/nearley": "^2.11.2",
     "@types/node": "^16.7.0",
-    "@types/three": "^0.132.0",
+    "@types/three": "^0.134.0",
     "@typescript-eslint/eslint-plugin": "^4.29.2",
     "@typescript-eslint/parser": "^4.29.3",
     "eslint": "^7.32.0",
@@ -37,7 +37,7 @@
     "rollup-plugin-serve": "^1.1.0",
     "rollup-plugin-sourcemaps": "^0.6.3",
     "rollup-plugin-terser": "^7.0.2",
-    "rollup-plugin-typescript2": "^0.30.0",
+    "rollup-plugin-typescript2": "^0.31.1",
     "ts-node": "^10.2.1",
     "ts-transformer-keys": "^0.4.3",
     "typescript": "^4.3.5"
@@ -46,6 +46,6 @@
     "@lagdotcom/simple-inputs": "git+https://github.com/lagdotcom/simple-inputs.git",
     "debug": "^4.3.2",
     "eventemitter3": "^4.0.7",
-    "three": "^0.132.2"
+    "three": "^0.134.0"
   }
 }
