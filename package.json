@@ -44,7 +44,7 @@
   },
   "dependencies": {
     "@lagdotcom/simple-inputs": "git+https://github.com/lagdotcom/simple-inputs.git",
-    "debug": "^4.3.2",
+    "debug": "^4.3.3",
     "eventemitter3": "^4.0.7",
     "three": "^0.134.0"
   }
