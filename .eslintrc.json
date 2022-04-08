@@ -9,7 +9,6 @@
     "plugin:@typescript-eslint/recommended",
     "plugin:array-func/recommended",
     "plugin:eslint-comments/recommended",
-    "plugin:radar/recommended",
     "prettier"
   ],
   "parser": "@typescript-eslint/parser",
@@ -17,13 +16,7 @@
     "ecmaVersion": 12,
     "sourceType": "module"
   },
-  "plugins": [
-    "@typescript-eslint",
-    "array-func",
-    "eslint-comments",
-    "radar",
-    "woke"
-  ],
+  "plugins": ["@typescript-eslint", "array-func", "eslint-comments", "woke"],
   "rules": {
     "woke/all": 2
   }
