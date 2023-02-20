@@ -23,7 +23,7 @@
     "@types/nearley": "^2.11.2",
     "@types/node": "^18.11.18",
     "@types/three": "^0.148.0",
-    "@typescript-eslint/eslint-plugin": "^5.48.2",
+    "@typescript-eslint/eslint-plugin": "^5.53.0",
     "@typescript-eslint/parser": "^5.48.2",
     "eslint": "^8.31.0",
     "eslint-config-prettier": "^8.6.0",
